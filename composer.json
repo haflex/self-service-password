@@ -1,4 +1,6 @@
 {
+    "name": "someone/self-service-password",
+    "description": "Self service password",
     "require": {
         "ltb-project/ldap": "v0.1.0"
     }
