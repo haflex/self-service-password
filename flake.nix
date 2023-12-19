@@ -18,13 +18,14 @@
     };
   in {
     packages = {
-      ssp = sspc;
-      default = sspc;
+      ssp = ssp;
+      default = ssp;
     };
     devShells.default = pkgs.mkShell {
       packages = [
         pkgs.php
         pkgs.php83Packages.composer
+        pkgs.smarty3
       ];
     };
   });

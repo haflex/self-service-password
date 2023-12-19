@@ -15,7 +15,7 @@
  */
 function detectLanguage($defaultLanguage, $availableLanguages)
 {
-    $acceptedLanguages = filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE', FILTER_SANITIZE_STRING);
+    $acceptedLanguages = filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE', FILTER_SANITIZE_SPECIAL_CHARS);
     $languageList      = explode(',', $acceptedLanguages);
     $choosenLanguage= $defaultLanguage;
     foreach($languageList as $currentLanguage) {

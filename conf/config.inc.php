@@ -413,6 +413,11 @@ if (file_exists (__DIR__ . '/config.inc.local.php')) {
     require_once __DIR__ . '/config.inc.local.php';
 }
 
+# Allow to override current setting with config file given by environment
+if (isset($_ENV['SSP_CONFIG_FILE'])) {
+    require_once $_ENV['SSP_CONFIG_FILE'];
+}
+
 # Smarty
 if (!defined("SMARTY")) {
     define("SMARTY", "/usr/share/php/smarty3/Smarty.class.php");
