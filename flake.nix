@@ -11,29 +11,20 @@
   let
     pkgs = nixpkgs.legacyPackages.${system};
     ssp = pkgs.php.buildComposerProject {
-        pname = "self-service-password";
-        version = "1.6.0";
-        src = self;
-        vendorHash = "";
-    };
-    lum = pkgs.stdenvNoCC.mkDerivation {
       pname = "self-service-password";
-      version = "1.5.4";
       src = self;
-      installPhase = ''
-        mkdir $out
-        cp -r htdocs/ lang/ lib/ templates/ $out/
-      '';
+      version = "1.6.0";
+      vendorHash = "sha256-kOO8E0+mYtq7WqkPpYtfRCvEBu+Z25uPD5uNrJqZ+/c=";
     };
   in {
     packages = {
-      ssp = ssp;
-      default = ssp;
+      ssp = sspc;
+      default = sspc;
     };
     devShells.default = pkgs.mkShell {
-      packages = with pkgs; [
-        php
-        php83Packages.composer
+      packages = [
+        pkgs.php
+        pkgs.php83Packages.composer
       ];
     };
   });

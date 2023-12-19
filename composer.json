@@ -1,6 +1,7 @@
 {
     "name": "someone/self-service-password",
     "description": "Self service password",
+    "license": "GPL-3.0-only",
     "require": {
         "ltb-project/ldap": "v0.1.0"
     }
