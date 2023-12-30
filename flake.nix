@@ -54,8 +54,15 @@
         services.phpfpm.pools.ssp = let
           configFile = pkgs.writeText "sspConfig" ''
             <?php
-            $keyphrase = get_file_contents("${cfg.keyphraseFile}");
+            $keyphrase = file_get_contents("${cfg.keyphraseFile}");
             $audit_log_file = "${cfg.dataDir}/audit.log";
+            // Cache directory
+            $smarty_compile_dir = "${cfg.dataDir}/templates_c";
+            $smarty_cache_dir = "${cfg.dataDir}/cache";
+            // disable sms and question interface
+            $use_sms = false;
+            $use_questions = false;
+            $use_change = false;
             ?>
           '';
         in {
@@ -81,6 +88,15 @@
               # prepare dataDir
               if [ ! -f ${cfg.dataDir} ]; then
                 mkdir -p ${cfg.dataDir}
+                chown ssp:ssp ${cfg.dataDir}
+                chmod 775 ${cfg.dataDir}
+              fi
+              # create secret
+              if [ ! -f ${cfg.keyphraseFile} ]; then
+                mkdir -p $(dirname ${cfg.keyphraseFile})
+                head /dev/urandom | tr -dc A-Za-z0-9 | head -c10 > ${cfg.keyphraseFile}
+                chown ssp:ssp ${cfg.keyphraseFile}
+                chmod 440 ${cfg.keyphraseFile}
               fi
             '';
             wantedBy = [ "phpfpm-ssp.service" ];

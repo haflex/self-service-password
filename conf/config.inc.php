@@ -414,8 +414,8 @@ if (file_exists (__DIR__ . '/config.inc.local.php')) {
 }
 
 # Allow to override current setting with config file given by environment
-if (isset($_ENV['SSP_CONFIG_FILE'])) {
-    require_once $_ENV['SSP_CONFIG_FILE'];
+if (getenv('SSP_CONFIG_FILE')) {
+    require_once getenv('SSP_CONFIG_FILE');
 }
 
 # Smarty
