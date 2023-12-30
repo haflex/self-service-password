@@ -14,6 +14,9 @@
         src = self;
         version = "1.6.0";
         vendorHash = "sha256-kOO8E0+mYtq7WqkPpYtfRCvEBu+Z25uPD5uNrJqZ+/c=";
+        patchPhase = ''
+          sed -i 's|define("SMARTY".*|define("SMARTY", "${pkgs.smarty3}/Smarty.class.php");|' conf/config.inc.php
+        '';
       };
     in {
       packages = {
@@ -34,14 +37,31 @@
     in {
       options.services.self-service-password = {
         enable = mkEnableOption "Enables the self service password service";
+        keyphraseFile = mkOption rec {
+          type = types.str;
+          default = "/var/keys/sspSecret";
+          example = default;
+          description = "file containing the secret key for generating password reset tokens";
+        };
+        dataDir = mkOption rec {
+          type = types.str; #TODO types.path?
+          default = "/var/lib/self-service-password";
+          example = default;
+          description = "state directory for self service password";
+        };
       };
       config = mkIf cfg.enable {
         services.phpfpm.pools.ssp = let
-          configFile = "Hallo";
+          configFile = pkgs.writeText "sspConfig" ''
+            <?php
+            $keyphrase = get_file_contents("${cfg.keyphraseFile}");
+            $audit_log_file = "${cfg.dataDir}/audit.log";
+            ?>
+          '';
         in {
           user = "ssp";
           phpEnv = {
-            SSP_CONFIG_FILE = configFile;
+            SSP_CONFIG_FILE = toString configFile;
           };
           settings = {
             "listen.owner" = config.services.nginx.user;
@@ -56,6 +76,15 @@
             "catch_workers_output" = true;
           };
         };
+        systemd.services.ssp-setup = {
+            script = ''
+              # prepare dataDir
+              if [ ! -f ${cfg.dataDir} ]; then
+                mkdir -p ${cfg.dataDir}
+              fi
+            '';
+            wantedBy = [ "phpfpm-ssp.service" ];
+          };
         services.nginx.virtualHosts.ssp = {
           #serverName = "speck"; #cfg.hostName;
           root = "${self.packages.x86_64-linux.ssp}/share/php/self-service-password/htdocs";
@@ -78,7 +107,9 @@
       modules = [
         self.nixosModules.default
         ({config, ...}: {
-          services.self-service-password.enable = true;
+          services.self-service-password = {
+            enable = true;
+          };
           boot.isContainer = true;
           networking.hostName = "speck";
           services.nginx.enable = true;
