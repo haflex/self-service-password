@@ -19,6 +19,60 @@ in {
       example = default;
       description = "state directory for self service password";
     };
+    ldap = {
+      url = mkOption {
+        type = types.str;
+        default = "ldap://localhost";
+        example = "ldap://localhost";
+        description = "hostname of the LDAP server to connect to";
+      };
+      starttls = mkOption {
+        type = types.bool;
+        default = false;
+        example = false;
+        description = "if to use TLS";
+      };
+      bindDN = mkOption {
+        type = types.str;
+        example = "cn=admin,dc=example,dc=com";
+        description = "DN to access the LDAP server";
+      };
+      bindPassFile = mkOption {
+        type = types.str;
+        default = "/var/keys/sspBindPass";
+        example = "/var/keys/sspBindPass";
+        description = "file with password to bind LDAP server";
+      };
+      base = mkOption {
+        type = types.str;
+        example = "ou=users,dc=example,dc=org";
+        description = "base DN inside the LDAP server";
+      };
+      loginAttribute = mkOption {
+        type = types.str;
+        default = "uid";
+        example = "uid";
+        description = "attribute to identify the login key";
+      };
+      fullnameAttribute = mkOption {
+        type = types.str;
+        default = "cn";
+        example = "cn";
+        description = "attribute to identify the users full name";
+      };
+      searchFilter = mkOption {
+        type = types.str;
+        default = "(&(objectClass=person)(uid={login}))";
+        example = "(&(objectClass=person)(uid={login}))";
+        description = "filter used when finding user";
+      };
+      hash = mkOption {
+        type = types.str;
+        default = "SSHA";
+        example = "CRYPT";
+        description = "hash algorithm used to store the password";
+      };
+    };
   };
   config = mkIf cfg.enable {
     services.phpfpm.pools.ssp = let
@@ -33,6 +87,18 @@ in {
         $use_sms = false;
         $use_questions = false;
         $use_change = false;
+        //setup LDAP
+        $ldap_url = "${cfg.ldap.url}";
+        $ldap_starttls = ${if cfg.ldap.starttls then "true" else "false"};
+        $ldap_binddn = "${cfg.ldap.bindDN}";
+        $ldap_bindpw = "test123"; //file_get_contents("${cfg.ldap.bindPassFile}");
+        $ldap_base = "${cfg.ldap.base}";
+        $ldap_login_attribute = "${cfg.ldap.loginAttribute}";
+        $ldap_fullname_attribute = "${cfg.ldap.fullnameAttribute}";
+        $ldap_filter = "${cfg.ldap.searchFilter}";
+        $ldap_network_timeout = 5;
+        $ldap_krb5ccname = NULL;
+        $hash = "${cfg.ldap.hash}";
         ?>
       '';
     in {

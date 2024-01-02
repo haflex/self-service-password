@@ -42,15 +42,8 @@
               "{0}to dn.one=ou=roles,dc=example,dc=org by anonymous auth" #authentification as role
               #access to users
               ''{1}to dn.subtree=ou=users,dc=example,dc=org
-                by dn.base=cn=reader,ou=roles,dc=example,dc=org read 
-                by self read
-                by dn.base=cn=writer,ou=roles,dc=example,dc=org write
+                by self write
                 by anonymous auth
-              ''
-              #access to groups
-              ''{2} to dn.subtree=ou=groups,dc=example,dc=org
-                by dn.base=cn=reader,ou=roles,dc=example,dc=org read
-                by dn.base=cn=writer,ou=roles,dc=example,dc=org write
               ''
               # searching
               "{3} to dn.subtree=dc=example,dc=org by users read"
@@ -64,6 +57,20 @@
         dn: dc=example,dc=org
         objectClass: domain
         dc: example
+
+        dn: ou=users,dc=example,dc=org
+        objectClass: organizationalUnit
+        ou: users
+
+        dn: uid=user1,ou=users,dc=example,dc=org
+        objectClass: person
+        objectClass: inetOrgPerson
+        cn: Bob User
+        givenName: Bob
+        mail: bob@pendor.de
+        sn: User
+        uid: user1
+        userPassword: {SSHA}0zY687a4lDfBmjxzQRAWdlKkAW0UwyWE
       '';
     };
   };
