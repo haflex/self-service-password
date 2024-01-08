@@ -73,6 +73,72 @@ in {
         description = "hash algorithm used to store the password";
       };
     };
+    email = {
+      ldapAttribute = mkOption {
+        type = types.str;
+        default = "mail";
+        example = "proxyAddresses";
+        description = "attribute to identify the users email address";
+      };
+      from = mkOption {
+        type = types.str;
+        example = "admin@example.com";
+        description = "email address to send emails from";
+      };
+      fromName = mkOption {
+        type = types.str;
+        default = "Self Service Password";
+        example = "Self Service Password";
+        description = "name to send emails from";
+      };
+      smtp = {
+        host = mkOption {
+          type = types.str;
+          default = "localhost";
+          example = "localhost";
+          description = "hostname of the SMTP server to connect to";
+        };
+        port = mkOption {
+          type = types.int;
+          default = 25;
+          example = 25;
+          description = "port of the SMTP server to connect to";
+        };
+        user = mkOption {
+          type = types.str;
+          default = "";
+          example = "admin";
+          description = "username to authenticate with the SMTP server";
+        };
+        passFile = mkOption {
+          type = types.str;
+          default = "";
+          example = "/var/key/sspSmtpPass";
+          description = "password to authenticate with the SMTP server";
+        };
+        auth = mkOption {
+          type = types.bool;
+          default = false;
+          description = "if to use authentication with the SMTP server";
+        };
+        debug = mkOption {
+          type = types.int;
+          default = 0;
+          description = "debug flags, see: https://github.com/PHPMailer/PHPMailer/wiki/Troubleshooting";
+        };
+        secure = mkOption {
+          type = types.str;
+          default = "tls";
+          example = "ssl";
+          description = "security method to use. Either tls or ssl";
+        };
+      };
+    };
+    resetUrl = mkOption {
+      type = types.str;
+      example = "https://localhost/reset.php";
+      description = "URL to the reset page";
+    };
   };
   config = mkIf cfg.enable {
     services.phpfpm.pools.ssp = let
@@ -91,7 +157,7 @@ in {
         $ldap_url = "${cfg.ldap.url}";
         $ldap_starttls = ${if cfg.ldap.starttls then "true" else "false"};
         $ldap_binddn = "${cfg.ldap.bindDN}";
-        $ldap_bindpw = "test123"; //file_get_contents("${cfg.ldap.bindPassFile}");
+        $ldap_bindpw = trim(file_get_contents("${cfg.ldap.bindPassFile}"));
         $ldap_base = "${cfg.ldap.base}";
         $ldap_login_attribute = "${cfg.ldap.loginAttribute}";
         $ldap_fullname_attribute = "${cfg.ldap.fullnameAttribute}";
@@ -99,6 +165,19 @@ in {
         $ldap_network_timeout = 5;
         $ldap_krb5ccname = NULL;
         $hash = "${cfg.ldap.hash}";
+        //setup email
+        $mail_attributes = array( "${cfg.email.ldapAttribute}" );
+        $mail_from = "${cfg.email.from}";
+        $mail_from_name = "${cfg.email.fromName}";
+        $mail_smtp_host = '${cfg.email.smtp.host}';
+        $mail_smtp_auth = ${if cfg.email.smtp.auth then "true" else "false"};
+        $mail_smtp_user = '${cfg.email.smtp.user}';
+        $mail_smtp_pass = "";
+        $mail_smtp_port = ${toString cfg.email.smtp.port};
+        $mail_smtp_debug = ${toString cfg.email.smtp.debug};
+        $mail_smtp_secure = "${cfg.email.smtp.secure}";
+        //url generation
+        $reset_url = "${cfg.resetUrl}";
         ?>
       '';
     in {
