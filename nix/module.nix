@@ -139,7 +139,8 @@ in {
       };
     };
     resetUrl = mkOption {
-      type = types.str;
+      type = types.nullOr types.str;
+      default = null;
       example = "https://localhost/reset.php";
       description = "URL to the reset page";
     };
@@ -181,7 +182,7 @@ in {
         $mail_smtp_debug = ${toString cfg.email.smtp.debug};
         $mail_smtp_secure = "${cfg.email.smtp.secure}";
         //url generation
-        $reset_url = "${cfg.resetUrl}";
+        $reset_url = "${if cfg.resetUrl != null then cfg.resetUrl else if cfg.host != null then "https://${host}/reset.php" else "$_SERVER['HTTP_X_FORWARDED_PROTO'] . '://' . $_SERVER['HTTP_X_FORWARDED_HOST'] . $_SERVER['SCRIPT_NAME']" };
         ?>
       '';
     in {
