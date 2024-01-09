@@ -177,7 +177,7 @@ in {
         $mail_smtp_host = '${cfg.email.smtp.host}';
         $mail_smtp_auth = ${if cfg.email.smtp.auth then "true" else "false"};
         $mail_smtp_user = '${cfg.email.smtp.user}';
-        $mail_smtp_pass = "";
+        $mail_smtp_pass = trim(file_get_contents("${cfg.smtp.passFile}"));
         $mail_smtp_port = ${toString cfg.email.smtp.port};
         $mail_smtp_debug = ${toString cfg.email.smtp.debug};
         $mail_smtp_secure = "${cfg.email.smtp.secure}";
