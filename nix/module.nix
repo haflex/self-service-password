@@ -1,11 +1,6 @@
-self: { config, pkgs, lib, ...}:
+{ config, pkgs, lib, ssp, ...}:
 with lib;
 let
-  ssp = pkgs.callPackage ./package.nix {
-    inherit self;
-    buildComposerProject = pkgs.php.buildComposerProject;
-    smarty3 = pkgs.smarty3;
-  };
   cfg = config.services.self-service-password;
 in {
   options.services.self-service-password = {

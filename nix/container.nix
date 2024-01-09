@@ -1,6 +1,7 @@
 {nixpkgs, self}:
 nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
+  specialArgs = { ssp = self.packages.x86_64-linux.ssp; };
   modules = [
     self.nixosModules.default
     ./openldap.nix
