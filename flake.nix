@@ -9,7 +9,11 @@
   outputs = { self, nixpkgs, flake-utils }:
   flake-utils.lib.eachDefaultSystem (system: let pkgs = nixpkgs.legacyPackages.${system}; in
     let
-      ssp = pkgs.callPackage nix/package.nix {inherit self;};
+      ssp = pkgs.callPackage nix/package.nix {
+        inherit self;
+        buildComposerProject = pkgs.php.buildComposerProject;
+        smarty3 = pkgs.smarty3;
+      };
     in {
       packages = {
         ssp = ssp;
