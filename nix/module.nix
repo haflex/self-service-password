@@ -1,5 +1,4 @@
-{self}:
-{ config, pkgs, lib, ...}:
+self: { config, pkgs, lib, ...}:
 with lib;
 let
   ssp = pkgs.callPackage ./package.nix {

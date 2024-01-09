@@ -28,7 +28,7 @@
       };
     }
   ) // {
-    nixosModules.default = import ./nix/module.nix {inherit self;};
+    nixosModules.default = import ./nix/module.nix self;
     nixosConfigurations.container = import ./nix/container.nix {inherit nixpkgs self;};
  };
 }
