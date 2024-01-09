@@ -19,6 +19,12 @@ in {
       example = default;
       description = "state directory for self service password";
     };
+    host = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      example = "ssp.example.com";
+      description = "hostname of the server";
+    };
     ldap = {
       url = mkOption {
         type = types.str;
@@ -217,6 +223,7 @@ in {
       wantedBy = [ "phpfpm-ssp.service" ];
     };
     services.nginx.virtualHosts.ssp = {
+      serverName = cfg.host;
       root = "${ssp}/share/php/self-service-password/htdocs";
       locations = {
         "/" = { index = "index.php"; };
