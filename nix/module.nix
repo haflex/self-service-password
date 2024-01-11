@@ -18,8 +18,7 @@ in {
       description = "state directory for self service password";
     };
     host = mkOption {
-      type = types.nullOr types.str;
-      default = null;
+      type = types.str;
       example = "ssp.example.com";
       description = "hostname of the server";
     };
@@ -221,8 +220,7 @@ in {
       '';
       wantedBy = [ "phpfpm-ssp.service" ];
     };
-    services.nginx.virtualHosts.ssp = {
-      serverName = cfg.host;
+    services.nginx.virtualHosts."${cfg.host}" = {
       root = "${ssp}/share/php/self-service-password/htdocs";
       locations = {
         "/" = { index = "index.php"; };

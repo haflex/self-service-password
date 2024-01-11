@@ -22,6 +22,7 @@ nixpkgs.lib.nixosSystem {
           };
         };
         resetUrl = "http://ssp/";
+        host = "ssp";
       };
       boot.isContainer = true;
       networking.hostName = "speck";
